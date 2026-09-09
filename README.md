@@ -1,19 +1,28 @@
 # MacPod
 
-A tiny iPod Nano (technically Nano 1) on your Mac that controls whatever's playing.
+A tiny iPod nano on your Mac that controls whatever's playing.
 
 
 <img width="400" height="647" alt="macpod_comp" src="https://github.com/user-attachments/assets/5612780a-e944-499e-9210-3e626db0b6fb" />
 
 
-It looks like a first-gen iPod Nano and behaves like one. The clickwheel does what you'd expect — play, pause, skip. It shows the track, artist, album, artwork, and a proper blue-striped progress bar. It works with Apple Music, Spotify, YouTube, browsers, podcast apps — basically anything the Mac's system "Now Playing" knows about.
+It looks like a first-generation iPod nano and behaves like one. The clickwheel controls play, pause, and skip, while the screen shows the track, artist, album, artwork, and a blue-striped progress bar. It works with Apple Music, Spotify, YouTube, browsers, podcast apps — basically anything the Mac's system "Now Playing" knows about.
 
 ## Features
 
 - **Floating or Window mode** — keep it hovering always-on-top, or place it as a regular window.
+- **Two shells** — select the 1st or 6th generation in Settings → Shell. The window resizes in place.
 - **Light or dark shell** — it can show either a white or a black iPod, following your system dark mode. 
 - **Menu bar icon** — click it for show/hide, transport, settings, quit.
 - **Battery indicator** — the little icon in the screen header reflects your actual Mac battery.
+
+## Compact view
+
+Prefer something smaller? Choose **Settings → Shell → iPod nano (6th generation)** for a compact aluminum frame with artwork filling the screen. Hover to reveal the track, artist, silver playback controls, and progress.
+
+<img src="docs/images/compact-view.png" width="309" alt="MacPod's compact sixth-generation nano shell showing album artwork and playback controls" />
+
+The shell comes in silver or graphite through the Color setting and works in both Floating and Window modes. Right-click it to open Settings.
 
 ## Install
 

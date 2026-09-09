@@ -12,7 +12,18 @@ struct NanoView: View {
     }
 
     var body: some View {
-        draggableContent
+        switch settings.shellStyle {
+        case .nano1:
+            draggableContent
+        case .nano6:
+            NanoSixthView(
+                state: service.state,
+                isDark: settings.colorMode == .black ||
+                    (settings.colorMode == .system && systemColorScheme == .dark),
+                onCommand: service.send,
+                onMenu: onMenu
+            )
+        }
     }
 
     private var draggableContent: some View {
@@ -274,7 +285,7 @@ struct NanoView: View {
     }
 }
 
-private struct WindowDragging: ViewModifier {
+struct WindowDragging: ViewModifier {
     @ViewBuilder
     func body(content: Content) -> some View {
         if #available(macOS 15.0, *) {
@@ -299,13 +310,13 @@ struct NanoShadowView: View {
         Canvas { context, _ in
             let bodyRect = CGRect(
                 x: NanoMetrics.shadowMargin,
-                y: NanoMetrics.shadowMargin,
-                width: NanoMetrics.bodyWidth,
-                height: NanoMetrics.bodyHeight
+                y: NanoMetrics.shadowMargin + settings.shellStyle.topInset,
+                width: settings.shellStyle.bodySize.width,
+                height: settings.shellStyle.bodySize.height
             )
             let bodyPath = Path(
                 roundedRect: bodyRect,
-                cornerRadius: NanoMetrics.bodyCorner
+                cornerRadius: settings.shellStyle.cornerRadius
             )
 
             drawShadow(
@@ -330,7 +341,7 @@ struct NanoShadowView: View {
                 y: 1
             )
         }
-        .frame(width: NanoMetrics.windowWidth, height: NanoMetrics.windowHeight)
+        .frame(width: settings.shellStyle.shadowSize.width, height: settings.shellStyle.shadowSize.height)
         .allowsHitTesting(false)
     }
 

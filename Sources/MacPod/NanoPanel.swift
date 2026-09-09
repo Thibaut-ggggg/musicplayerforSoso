@@ -67,6 +67,31 @@ final class NanoPanel: NSPanel {
         self.shadowPanel = shadowPanel
     }
 
+    func apply(shell: ShellStyle) {
+        guard frame.size != shell.size else { return }
+
+        // Keep the top-right corner in place when switching device shapes.
+        var newFrame = NSRect(
+            x: frame.maxX - shell.size.width,
+            y: frame.maxY - shell.size.height,
+            width: shell.size.width,
+            height: shell.size.height
+        )
+        if let visible = screen?.visibleFrame {
+            newFrame.origin.x = max(visible.minX, min(newFrame.minX, visible.maxX - newFrame.width))
+            newFrame.origin.y = max(visible.minY, min(newFrame.minY, visible.maxY - newFrame.height))
+        }
+        setFrame(newFrame, display: true)
+
+        let margin = NanoMetrics.shadowMargin
+        shadowPanel?.setFrame(NSRect(
+            x: newFrame.minX - margin,
+            y: newFrame.minY - margin,
+            width: shell.shadowSize.width,
+            height: shell.shadowSize.height
+        ), display: true)
+    }
+
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
 }

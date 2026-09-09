@@ -28,12 +28,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         let panel = NanoPanel(
             rootView: root,
-            size: CGSize(width: NanoMetrics.bodyWidth, height: NanoMetrics.bodyHeight),
+            size: settings.shellStyle.size,
             mode: settings.windowMode
         )
         let shadowPanel = NanoShadowPanel(
             rootView: NanoShadowView(settings: settings),
-            size: CGSize(width: NanoMetrics.windowWidth, height: NanoMetrics.windowHeight),
+            size: settings.shellStyle.shadowSize,
             mode: settings.windowMode
         )
         panel.attachShadowPanel(shadowPanel)
@@ -46,6 +46,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 guard let self else { return }
                 DispatchQueue.main.async {
                     self.panel?.apply(mode: self.settings.windowMode)
+                    self.panel?.apply(shell: self.settings.shellStyle)
                 }
             }
             .store(in: &cancellables)

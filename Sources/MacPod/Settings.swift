@@ -1,6 +1,33 @@
 import SwiftUI
 import AppKit
 
+enum ShellStyle: String, CaseIterable, Identifiable {
+    case nano1, nano6
+
+    var id: String { rawValue }
+    var displayName: String {
+        switch self {
+        case .nano1: return "iPod nano (1st generation)"
+        case .nano6: return "iPod nano (6th generation)"
+        }
+    }
+
+    var bodySize: CGSize {
+        switch self {
+        case .nano1: return CGSize(width: NanoMetrics.bodyWidth, height: NanoMetrics.bodyHeight)
+        case .nano6: return CGSize(width: NanoSixthMetrics.bodyWidth, height: NanoSixthMetrics.bodyHeight)
+        }
+    }
+
+    var topInset: CGFloat { self == .nano6 ? NanoSixthMetrics.buttonHeight : 0 }
+    var cornerRadius: CGFloat { self == .nano6 ? NanoSixthMetrics.bodyCorner : NanoMetrics.bodyCorner }
+    var size: CGSize { CGSize(width: bodySize.width, height: bodySize.height + topInset) }
+    var shadowSize: CGSize {
+        CGSize(width: size.width + NanoMetrics.shadowMargin * 2,
+               height: size.height + NanoMetrics.shadowMargin * 2)
+    }
+}
+
 enum ColorMode: String, CaseIterable, Identifiable {
     case system, white, black
     var id: String { rawValue }
@@ -25,6 +52,14 @@ enum WindowMode: String, CaseIterable, Identifiable {
 }
 
 final class AppSettings: ObservableObject {
+    @AppStorage("shellStyle") var shellStyleRaw: String = ShellStyle.nano1.rawValue {
+        willSet { objectWillChange.send() }
+    }
+    var shellStyle: ShellStyle {
+        get { ShellStyle(rawValue: shellStyleRaw) ?? .nano1 }
+        set { shellStyleRaw = newValue.rawValue }
+    }
+
     @AppStorage("colorMode") var colorModeRaw: String = ColorMode.system.rawValue {
         willSet { objectWillChange.send() }
     }
@@ -91,6 +126,14 @@ struct SettingsView: View {
         VStack(spacing: 0) {
             Form {
                 Section {
+                    Picker("Shell", selection: Binding(
+                        get: { settings.shellStyle },
+                        set: { settings.shellStyle = $0 }
+                    )) {
+                        ForEach(ShellStyle.allCases) { shell in
+                            Text(shell.displayName).tag(shell)
+                        }
+                    }
                     Picker("Color", selection: Binding(
                         get: { settings.colorMode },
                         set: { settings.colorMode = $0 }
@@ -136,7 +179,7 @@ struct SettingsView: View {
             }
             .padding(16)
         }
-        .frame(width: 340, height: 300)
+        .frame(width: 380, height: 340)
     }
 }
 
