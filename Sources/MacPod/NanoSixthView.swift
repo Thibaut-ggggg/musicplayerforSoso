@@ -190,23 +190,31 @@ struct NanoSixthView: View {
 
     private var playbackOverlay: some View {
         VStack(spacing: 0) {
-            VStack(spacing: 3) {
-                Text(state.title ?? "Not Playing")
-                    .font(.system(size: 12, weight: .semibold))
-                    .lineLimit(2)
-                if let artist = state.artist, !artist.isEmpty {
-                    Text(artist)
-                        .font(.system(size: 10))
-                        .foregroundStyle(.white.opacity(0.85))
-                        .lineLimit(1)
+            Button(action: onMenu) {
+                VStack(spacing: 3) {
+                    Text(state.title ?? "Not Playing")
+                        .font(.system(size: 14, weight: .semibold))
+                        .lineLimit(2)
+                    if let artist = state.artist, !artist.isEmpty {
+                        Text(artist)
+                            .font(.system(size: 12))
+                            .foregroundStyle(.white.opacity(0.85))
+                            .lineLimit(1)
+                    }
                 }
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+                .background(LinearGradient(colors: [.black.opacity(0.82), .black.opacity(0.45)],
+                                           startPoint: .top, endPoint: .bottom))
+                .contentShape(Rectangle())
             }
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity)
-            .background(LinearGradient(colors: [.black.opacity(0.82), .black.opacity(0.45)],
-                                       startPoint: .top, endPoint: .bottom))
+            .buttonStyle(.plain)
+            .focused($controlsFocused)
+            .accessibilityLabel("Open Settings")
+            .accessibilityValue([state.title, state.artist].compactMap { $0 }.joined(separator: ", "))
+            .help("Open Settings")
 
             Spacer(minLength: 0)
 

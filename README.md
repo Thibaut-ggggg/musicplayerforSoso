@@ -11,6 +11,7 @@ It looks like a first-generation iPod nano and behaves like one. The clickwheel 
 ## Features
 
 - **Floating or Window mode** — keep it hovering always-on-top, or place it as a regular window.
+- **Remembers its position** — reopens where you left it and stays onscreen when your display setup changes.
 - **Two shells** — select the 1st or 6th generation in Settings → Shell. The window resizes in place.
 - **Light or dark shell** — it can show either a white or a black iPod, following your system dark mode. 
 - **Menu bar icon** — click it for show/hide, transport, settings, quit.
@@ -22,7 +23,7 @@ Prefer something smaller? Choose **Settings → Shell → iPod nano (6th generat
 
 <img src="docs/images/compact-view.png" width="309" alt="MacPod's compact sixth-generation nano shell showing album artwork and playback controls" />
 
-The shell comes in silver or graphite through the Color setting and works in both Floating and Window modes. Right-click it to open Settings.
+The shell comes in silver or graphite through the Color setting and works in both Floating and Window modes. Click the song-title bar or right-click the shell to open Settings.
 
 ## Install
 

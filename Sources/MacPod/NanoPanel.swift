@@ -4,10 +4,13 @@ import SwiftUI
 /// A borderless, Nano-shaped window. Operates either as a floating panel
 /// (always on top, joins all spaces) or as a regular window pinned to one
 /// Mission Control space.
-final class NanoPanel: NSPanel {
+final class NanoPanel: NSPanel, NSWindowDelegate {
     private var shadowPanel: NanoShadowPanel?
+    private let positionDefaults: UserDefaults
 
-    init<Content: View>(rootView: Content, size: CGSize, mode: WindowMode) {
+    init<Content: View>(rootView: Content, size: CGSize, mode: WindowMode,
+                       positionDefaults: UserDefaults = .standard) {
+        self.positionDefaults = positionDefaults
         super.init(
             contentRect: NSRect(origin: .zero, size: size),
             styleMask: [.borderless, .nonactivatingPanel],
@@ -39,9 +42,33 @@ final class NanoPanel: NSPanel {
                 x: visible.maxX - size.width - 32,
                 y: visible.maxY - size.height - 32
             )
-            self.setFrameOrigin(origin)
+            self.setFrameOrigin(WindowPosition.constrained(
+                WindowPosition.load(from: positionDefaults) ?? origin,
+                size: size, visibleFrames: NSScreen.screens.map(\.visibleFrame)
+            ))
         }
+        delegate = self
+        savePosition()
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(screenParametersChanged),
+            name: NSApplication.didChangeScreenParametersNotification, object: nil
+        )
     }
+
+    func windowDidMove(_ notification: Notification) { savePosition() }
+
+    private func savePosition() {
+        WindowPosition.save(frame.origin, to: positionDefaults)
+    }
+
+    @objc private func screenParametersChanged() {
+        setFrameOrigin(WindowPosition.constrained(
+            frame.origin, size: frame.size, visibleFrames: NSScreen.screens.map(\.visibleFrame)
+        ))
+        savePosition()
+    }
+
+    deinit { NotificationCenter.default.removeObserver(self) }
 
     func apply(mode: WindowMode) {
         switch mode {
@@ -82,6 +109,7 @@ final class NanoPanel: NSPanel {
             newFrame.origin.y = max(visible.minY, min(newFrame.minY, visible.maxY - newFrame.height))
         }
         setFrame(newFrame, display: true)
+        savePosition()
 
         let margin = NanoMetrics.shadowMargin
         shadowPanel?.setFrame(NSRect(
@@ -94,6 +122,40 @@ final class NanoPanel: NSPanel {
 
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
+}
+
+enum WindowPosition {
+    private static let key = "windowPosition"
+
+    static func save(_ origin: CGPoint, to defaults: UserDefaults) {
+        guard origin.x.isFinite, origin.y.isFinite else { return }
+        defaults.set(["x": Double(origin.x), "y": Double(origin.y)], forKey: key)
+    }
+
+    static func load(from defaults: UserDefaults) -> CGPoint? {
+        guard let value = defaults.dictionary(forKey: key),
+              let x = value["x"] as? Double, let y = value["y"] as? Double,
+              x.isFinite, y.isFinite else { return nil }
+        return CGPoint(x: x, y: y)
+    }
+
+    static func constrained(_ origin: CGPoint, size: CGSize, visibleFrames: [CGRect]) -> CGPoint {
+        guard var target = visibleFrames.first else { return origin }
+        let window = CGRect(origin: origin, size: size)
+        var largestArea: CGFloat = 0
+        for visible in visibleFrames {
+            let intersection = window.intersection(visible)
+            let area = intersection.isNull ? 0 : intersection.width * intersection.height
+            if area > largestArea {
+                target = visible
+                largestArea = area
+            }
+        }
+        return CGPoint(
+            x: max(target.minX, min(origin.x, target.maxX - size.width)),
+            y: max(target.minY, min(origin.y, target.maxY - size.height))
+        )
+    }
 }
 
 /// A click-through child window that carries the visual shadow without

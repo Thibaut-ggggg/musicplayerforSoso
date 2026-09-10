@@ -8,6 +8,7 @@ let package = Package(
         .executableTarget(
             name: "MacPod",
             path: "Sources/MacPod"
-        )
+        ),
+        .testTarget(name: "MacPodTests", dependencies: ["MacPod"])
     ]
 )
